@@ -1,22 +1,5 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Albert Lombarte
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
 /**
  * Form utilites to manage data validation.
@@ -55,13 +38,6 @@
 class Form
 {
 	/**
-	 * Singleton keeper.
-	 *
-	 * @var Form
-	 */
-	protected static $instance;
-
-	/**
 	 * Filter object.
 	 *
 	 * @var Filter
@@ -86,25 +62,13 @@ class Form
 	 */
 	protected $is_valid = true;
 
-	
-	private function __construct( $filter )
-	{
-		$this->filter = $filter;
-	}
-
 	/**
-	 * Singleton
-	 *
 	 * @param Filter $filter Filter object (FilterPost, FilterGet...)
 	 * @return Form
 	 */
-	static public function getInstance( Filter $filter )
+	public function __construct( Filter $filter )
 	{
-		if ( !self::$instance )
-		{
-			self::$instance = new self ( $filter );
-		}
-		return self::$instance;
+		$this->filter = $filter;
 	}
 
 	/**
@@ -142,7 +106,7 @@ class Form
 		$filter_result = call_user_func_array( array( $this->filter, $filter_rule ), $total_params );
 
 		// The filter might sanitize the given string, so must be returned cleaned up. Apply filter:
-		if ( !is_bool( $filter_result ) )
+		if ( !is_bool( $filter_result ) || $filter_rule === 'getBoolean' )
 		{
 			$this->fields[$name] = $filter_result;
 		}
@@ -314,7 +278,7 @@ class Form
 
 }
 
-class Exception_Form extends Exception
+class Exception_Form extends \Exception
 {
 
 }

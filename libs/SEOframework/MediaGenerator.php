@@ -1,22 +1,5 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Carlos Soriano
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
 /**
  * Generates media files.
@@ -95,7 +78,6 @@ class MediaGenerator
 		$this->instance_static_host = Domains::getInstance()->getStaticHost();
 		$this->static_path = ROOT_PATH . '/instances/' . $this->working_instance . '/public/static/';
 		$this->hashes_file = $this->static_path . $this->media_type . '.hashes.php';
-		$this->svn_entries_file = $this->static_path . '.svn/entries';
 
 		foreach ( $this->instance_inheritance as $instance )
 		{
@@ -168,17 +150,22 @@ class MediaGenerator
 		return ( $checkout_revision === $revision );
 	}
 
-	protected function getCheckoutRevision()
+	public static function getCheckoutRevision( $root_path = ROOT_PATH )
 	{
-		$lines = file( $this->svn_entries_file );
-
-		return (integer)$lines[3];
+		$revision = rtrim( file_get_contents( $root_path . '/.git/HEAD' ) );
+		if ( strpos( $revision, 'ref: ' ) === 0 )
+		{
+			$revision_path = substr( $revision, 5 );
+			$revision = rtrim( file_get_contents( $root_path . '/.git/' . $revision_path ) );
+		}
+		
+		return $revision;
 	}
 
 	protected function getHashesFileContent( Array $generated )
 	{
 		$revision = $this->getCheckoutRevision();
-		return "<?php\n\$revision={$revision};\n\$hashes=" . var_export( $generated, true ) . ';';
+		return "<?php\n\$revision='{$revision}';\n\$hashes=" . var_export( $generated, true ) . ';';
 	}
 
 	protected function generateAllMediaGroups()

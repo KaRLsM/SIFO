@@ -1,22 +1,5 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Albert Lombarte
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
 abstract class Controller
 {
@@ -31,13 +14,6 @@ abstract class Controller
 	 * Use compression in caching?
 	 */
 	const CACHE_COMPRESS = 0;
-
-	/**
-	 * Define the format of the stored cache tag.
-	 *
-	 * @var string
-	 */
-	const CACHE_TAG_STORE_FORMAT = '!tag-%s=%s';
 
 	/**
 	 * Stores the final cache name. This param cannot be initialized to a default value.
@@ -130,7 +106,7 @@ abstract class Controller
 	 *
 	 * @var string
 	 */
-	protected $layout;
+	private $layout;
 
 	abstract function build();
 
@@ -171,6 +147,45 @@ abstract class Controller
 		$this->params['page'] = $this->getCurrentPage();
 
 		$this->view = new View();
+	}
+	
+	public function getAssignedVars()
+	{
+		return $this->view->getTemplateVars();
+	}
+	
+	/**
+	 * Performs the form validation workflow.
+	 * 
+	 * @param type $submit_button
+	 * @param type $form_config
+	 * @return null if no submit sent. True if validated correctly, false otherwise.
+	 */
+	protected function getValidatedForm( $submit_button, $form_config, $default_fields = array() )
+	{
+		$post = FilterPost::getInstance();
+		
+		$form = new Form( $post, $this->view );
+		if ( $post->isSent( $submit_button ) )
+		{			
+			$return = $form->validateElements( $form_config );
+			
+			if ( $return )
+			{
+				$return = $form;
+			}
+		}
+		else
+		{
+			$form->addFields( $default_fields );
+			$return = null;
+		}
+		
+		$this->assign( 'form_values', $form->getFields() );
+		$this->assign( 'requirements', $form->getRequirements( $form_config ) );
+		$this->assign( 'error', $form->getErrors() );
+		
+		return $return;
 	}
 
 	/**
@@ -504,70 +519,21 @@ abstract class Controller
 		}
 
 		// Prepend necessary values to cache:
-		$cache_key['name'] = $this->_getFinalCacheKeyName( $cache_key );
+		$cache_key['name'] = $this->_getFinalCacheKeyName( $cache_key['name'] );
 
 		return $cache_key;
+
 	}
 
 	/**
 	 * Returns the final cache name, prepending the necessary attributes.
 	 *
-	 * @param array $definition Cache definition.
-	 * @return string
+	 * @param unknown_type $key
+	 * @return unknown
 	 */
-	private function _getFinalCacheKeyName( Array $definition )
+	private function _getFinalCacheKeyName( $key )
 	{
-		$cache_key = array();
-		$cache_base_key = array();
-
-		// First of all, let's construct the cache base with domain, language and controller name.
-		$cache_base_key[] = Domains::getInstance()->getDomain();
-		$cache_base_key[] = $this->language;
-
-		// We use the "name" if is set or the controller name instead, then we remove it from definition.
-		$ctrl_name = get_class( $this );
-		if ( isset( $definition['name'] ) && !empty( $definition['name'] ) )
-		{
-			$ctrl_name = $definition['name'];
-			unset( $definition['name'] );
-		}
-
-		$cache_base_key[] = $ctrl_name;
-
-		// Now we add the rest of identifiers of the definition excluding the "expiration".
-		unset( $definition['expiration'] );
-
-		if ( !empty( $definition ) )
-		{
-			foreach ( $definition as $key => $val )
-			{
-				$cache_key[] = $this->getCacheTag( $key, $val );
-			}
-			sort( $cache_key );
-		}
-
-		return implode( '_', array_merge( $cache_base_key, $cache_key ) );
-	}
-
-	/**
-	 * Construct the cache tag if it's defined in config.
-	 *
-	 * @param string $tag Cache tag.
-	 * @param mixed $value Cache value.
-	 * @return string
-	 */
-	protected function getCacheTag( $tag, $value )
-	{
-		$cache_tag = $tag . '=' . $value;
-
-		$cache_config = Config::getInstance()->getConfig( 'memcache' );
-		if ( isset( $cache_config['cache_tags'] ) && in_array( $tag, $cache_config['cache_tags'] ) )
-		{
-			$pointer = Cache::getInstance()->get( sprintf( self::CACHE_TAG_STORE_FORMAT, $tag, $value ) );
-			$cache_tag .= '/' . ( int ) $pointer;
-		}
-
-		return $cache_tag;
+		return Domains::getInstance()->getDomain() . '_' . $this->language .'_' . $key;
 	}
 
 	/**
@@ -582,41 +548,11 @@ abstract class Controller
 		return false;
 	}
 
-	/**
-	 * Deletes the cache of a controller by name or array of properties.
-	 *
-	 * @param mixed $key_definition Array of keys=>values that define the cache,
-	 * or just a string that will be used as "name".
-	 */
-	public function deleteCache( $key_definition )
+	public function deleteCache( $key )
 	{
-		if ( !is_array( $key_definition ) )
-		{
-			$key_definition = array( 'name' => $key_definition );
-		}
-
-		return Cache::getInstance()->delete( $this->_getFinalCacheKeyName( $key_definition ) );
+		return Cache::getInstance()->delete( $this->_getFinalCacheKeyName( $key ) );
 	}
 
-	/**
-	 * Delete cache from all the controllers that contain the given tag.
-	 *
-	 * @param string $tag Cache tag.
-	 * @param mixed $value Cache value.
-	 * @return boolean
-	 */
-	public function deleteCacheByTag( $tag, $value )
-	{
-		$stored_tag = sprintf( self::CACHE_TAG_STORE_FORMAT, $tag, $value );
-		$cache_handler = Cache::getInstance();
-
-		if ( false === $cache_handler->add( $stored_tag, 1 ) )
-		{
-			$cache_handler->increment( $stored_tag );
-		}
-
-		return true;
-	}
 
 	protected function assignCommonVars()
 	{
@@ -706,7 +642,7 @@ abstract class Controller
 		$benchmark_key = 'controller_execution_time';
 		$this->startBench( $benchmark_key );
 
-		$module = Bootstrap::invokeController( $controller );
+		$module = Bootstrap::invokeController( $controller, $this );
 		$module->setParams( array_merge( $this->getParams(), $params ) );
 		$module->preDispatch();
 		$cached_content = $module->grabCache();
@@ -787,7 +723,7 @@ abstract class Controller
 	 */
 	public function getParsedParam( $param_name )
 	{
-		if ( !empty( $this->params['parsed_params'] ) && isset( $param_name, $this->params['parsed_params'], $this->params['parsed_params'][$param_name] ) )
+								if ( !empty( $this->params['parsed_params'] ) && isset( $param_name, $this->params['parsed_params'], $this->params['parsed_params'][$param_name] ) )
 		{
 			return $this->params['parsed_params'][$param_name];
 		}

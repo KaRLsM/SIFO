@@ -1,24 +1,7 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Albert Lombarte
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
-class Model extends Database
+class Model
 {
 	/**
 	 * List of classes that will be autoloaded automatically.
@@ -26,23 +9,6 @@ class Model extends Database
 	 * Format: $include_classes = array( 'Metadata', 'FlashMessages', 'Session', 'Cookie' );
 	 */
 	protected $include_classes = array();
-
-	public function __construct()
-	{
-		$this->includeClasses();
-		$this->init();
-		return Database::getInstance();
-	}
-
-	/**
-	 * Use this method as constructor in chidren.
-	 *
-	 * @return unknown
-	 */
-	protected function init()
-	{
-		return true;
-	}
 
 	/**
 	 * Returns an element in the registry.

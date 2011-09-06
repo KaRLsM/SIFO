@@ -123,7 +123,7 @@ function smarty_function_fill_params($params, &$smarty)
 			}
 			elseif ( $_key == 'order' || $_key == 'onsale' )
 			{
-				$_val = I18N::getTranslation( $_val );
+				$_val = \SeoFramework\I18N::getTranslation( $_val );
 			}
 			
 			if ( method_exists( UtilsUvinum, 'normalize' ) )			

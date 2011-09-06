@@ -76,7 +76,7 @@ if (SMARTY_SPL_AUTOLOAD && set_include_path(get_include_path() . PATH_SEPARATOR 
         spl_autoload_register();
     } 
 } else {
-    spl_autoload_register('smartyAutoload');
+    spl_autoload_register('smartyAutoload', true, true);
 } 
 
 /**

@@ -69,9 +69,9 @@ function smarty_function_genurl( $params, &$smarty )
 			$n++;
 		}
 	}
-
-		$_html_result = $params['subject'];
-		$_original_html_result = $_html_result;
+	
+   	$_html_result = $params['subject'];
+   	$_original_html_result = $_html_result;
 
 	$normalize = ( !isset($params['normalize'] ) || $params['normalize'] != 'no' );
 	unset( $params['action'] );
@@ -148,10 +148,10 @@ function smarty_function_genurl( $params, &$smarty )
 				{
 					if ( true === $url_params_definition[$_key]['apply_translation'] )
 					{
-						$current_domain = I18N::getDomain();
-						I18N::setDomain( 'urlparams', I18N::getLocale() );
-						$_val[$__key] = I18N::getTranslation( $__val );
-						I18N::setDomain( $current_domain, I18N::getLocale() );
+						$current_domain = \SeoFramework\I18N::getDomain();
+						\SeoFramework\I18N::setDomain( 'urlparams', \SeoFramework\I18N::getLocale() );
+						$_val[$__key] = \SeoFramework\I18N::getTranslation( $__val );
+						\SeoFramework\I18N::setDomain( $current_domain, \SeoFramework\I18N::getLocale() );
 					}
 					else
 					{
@@ -165,12 +165,12 @@ function smarty_function_genurl( $params, &$smarty )
 				}
 				$_val = implode( ',', $_val );
 			}
-			elseif ( isset( $url_params_definition[$_key]['apply_translation'] ) && true === $url_params_definition[$_key]['apply_translation'] )
+			elseif ( true === $url_params_definition[$_key]['apply_translation'] )
 			{
-				$current_domain = I18N::getDomain();
-				I18N::setDomain( 'urlparams', I18N::getLocale() );
-				$_val = I18N::getTranslation( $_val );
-				I18N::setDomain( $current_domain, I18N::getLocale() );
+				$current_domain = \SeoFramework\I18N::getDomain();
+				\SeoFramework\I18N::setDomain( 'urlparams', \SeoFramework\I18N::getLocale() );
+				$_val = \SeoFramework\I18N::getTranslation( $_val );
+				\SeoFramework\I18N::setDomain( $current_domain, \SeoFramework\I18N::getLocale() );
 				if ( $normalize )
 				{
 					$_val = UrlParser::normalize( $_val );
@@ -192,7 +192,7 @@ function smarty_function_genurl( $params, &$smarty )
 				}
 				else
 				{
-					trigger_error( "fill: The parameter '" . $_key . "' is not defined in given params_definition", E_USER_NOTICE );
+					$smarty->trigger_error( "fill: The parameter '" . $_key . "' is not defined in given params_definition", E_USER_NOTICE );
 				}
 			}
 		}

@@ -1,4 +1,10 @@
 <?php
+/**
+ * This is the original EpiCurl class renamed.
+ *
+ * @see http://www.jaisenmathai.com/blog/2008/05/29/asynchronous-parallel-http-requests-using-php-multi_curl/#curl1
+ * @download https://github.com/jmathai/twitter-async/tre
+ */
 class EpiCurl
 {
   const timeout = 2;

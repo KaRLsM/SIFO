@@ -1,23 +1,7 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Carlos Soriano
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
+use PDO,PDOStatement;
 /**
  * DbStatement class that is extended to customize some PDO functionality.
  */
@@ -59,7 +43,14 @@ class MysqlStatement extends PDOStatement
 	 */
 	public function execute( $parameters = array(), $context = null )
 	{
-		return parent::execute( $parameters );
+		if ( $parameters !== array() )
+		{
+			return parent::execute( $parameters );
+		}
+		else
+		{
+			return parent::execute();
+		}
 	}
 
 	/**
@@ -125,7 +116,7 @@ class Mysql
 	 *
 	 * @var string
 	 */
-	protected $statement_class = 'MysqlStatement';
+	const STATEMENT_CLASS = '\\SeoFramework\\MysqlStatement';
 
 	/**
 	 * Initializes the PDO object with the domains.config.php database configuration.
@@ -142,7 +133,8 @@ class Mysql
 			$this->db_params['db_password'],
 			$this->db_params['db_init_commands']
 		);
-		$this->pdo->setAttribute( PDO::ATTR_STATEMENT_CLASS, array( $this->statement_class, array( $this->pdo, $profile ) ) );
+		$class = get_called_class();
+		$this->pdo->setAttribute( PDO::ATTR_STATEMENT_CLASS, array( $class::STATEMENT_CLASS, array( $this->pdo, $profile ) ) );
 	}
 
 	/**
@@ -184,8 +176,18 @@ class Mysql
 	 * @return DbStatement
 	 */
 	public function prepare( $statement, $driver_options = array() )
-	{
+	{	
 		return $this->pdo->prepare( $statement, $driver_options );
+	}
+	
+	/**
+	 * Returns the last inserted id.
+	 * 
+	 * @return string
+	 */
+	public function lastInsertId()
+	{
+		return $this->pdo->lastInsertId();
 	}
 
 	/**

@@ -1,22 +1,5 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Albert Lombarte
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
 /**
  * Filters the request array checking that the values accomplish the given filters.
@@ -86,7 +69,7 @@ class Filter
 	public function isEmpty( $var_name )
 	{
 		// I changed empty by strlen because we was sending that 0 is an empty field and this is a correct integer. Minutes for example:
-		return ( !isset( $this->request[$var_name] ) || ( is_array($this->request[$var_name]) && ( count( $this->request[$var_name] ) == 0 ) ) || ( !is_array($this->request[$var_name]) && (  strlen( $this->request[$var_name] ) == 0 ) ) );
+		return ( !isset( $this->request[$var_name] ) || ( strlen( $this->request[$var_name] ) == 0 ) );
 	}
 
 	/**
@@ -168,7 +151,7 @@ class Filter
 		}
 
 		return false;
-		// Vulnerable: return filter_var( $this->request[$var_name], FILTER_VALIDATE_EMAIL );
+		// Vulnerable (fixed on php 5.3.4): return filter_var( $this->request[$var_name], FILTER_VALIDATE_EMAIL );
 	}
 
 	/**
@@ -370,10 +353,8 @@ class Filter
 	 * Non-Matches:
 	 * 29/2/2005 | 29/02/13 | 29/02/2200
 	 *
-	 * Until PHP 5.3 is not widely used the DateTime won't be used.
-	 *
 	 * @param string $var_name
-	 * @param string $format (UNUSED yet) Any format accepted by date()
+	 * @param string $format Any format accepted by date()
 	 * @return mixed String of the date or false.
 	 */
 	public function getDate( $var_name, $format = 'd-m-Y' )
@@ -382,14 +363,59 @@ class Filter
 		{
 			return false;
 		}
-
-		// Matching a Date in mm/dd/yyyy Format
-		if ( preg_match( '/^(((0?[1-9]|[12]\d|3[01])[\.\-\/](0?[13578]|1[02])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}|\d))|((0?[1-9]|[12]\d|30)[\.\-\/](0?[13456789]|1[012])[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}|\d))|((0?[1-9]|1\d|2[0-8])[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?\d{2}|\d))|(29[\.\-\/]0?2[\.\-\/]((1[6-9]|[2-9]\d)?(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00)|00|[048])))$/i', $this->request[$var_name] ) )
-		{
-			return $this->request[$var_name];
-		}
-		// PHP 5.3 function: DateTime::createFromFormat( $format, $this->request[$var_name] )
 		
+		$date = \DateTime::createFromFormat( $format, $this->request[$var_name] );
+		if ( $date !== false )
+		{		
+			return $date->format( $format );
+		}
+		
+		return false;
+	}
+	
+	public function getDateWithDefaultValue( $var_name, $default_date, $format = 'd-m-Y' )
+	{
+		$date = $this->getDate( $var_name, $format );
+		if ( !$date )
+		{
+			$date = $default_date;
+		}
+		
+		return $date;
+	}
+	
+	public function getDateMultiValue( $var_name, $minimum_years = null, $second_var_name = null, $third_var_name = null, $format = 'd-m-Y' )
+	{
+		if ( !isset( $this->request[$var_name] ) )
+		{
+			return false;
+		}
+		
+		$field_values = $this->request[$var_name];
+		if ( null !== $second_var_name && null !== $third_var_name )
+		{
+			if ( isset( $this->request[$second_var_name] ) && isset( $this->request[$third_var_name] ) )
+			{
+				$field_values = $this->request[$var_name] . '/' .
+						$this->request[$second_var_name] . '/' .
+						$this->request[$third_var_name];
+			}
+		}
+		
+		$date = \DateTime::createFromFormat( $format, $field_values );
+		if ( $date !== false )
+		{
+			if ( null !== $minimum_years )
+			{
+				if ( new \DateTime('now') < $date->add( new \DateInterval( "P{$minimum_years}Y" ) ) )
+				{
+					return false;
+				}
+			}
+			
+			return $date->format( $format );
+		}
+
 		return false;
 	}
 
@@ -636,4 +662,4 @@ class FilterCustom extends Filter
 	}
 }
 
-class FilterException extends Exception {}
+class FilterException extends \Exception {}

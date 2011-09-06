@@ -1,25 +1,9 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Albert Lombarte
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
-// See available exceptions below this class.
-class SEO_Exception extends Exception
+// Most used exceptions, add more status code if needed below:
+
+class SEO_Exception extends \Exception
 {
 	/**
 	 * HTTP code used for this exception.
@@ -97,7 +81,7 @@ class SEO_Exception extends Exception
 		parent::__construct( $message, $code );
 
 		$current_exception = get_class( $this );
-		$current_exception_code = ( int ) str_replace( 'Exception_', '', $current_exception );
+		$current_exception_code = ( int ) str_replace( __NAMESPACE__ . '\\Exception_', '', $current_exception );
 
 		// See if the http status code needs a redirection:
 		if ( ( 300 <= $current_exception_code ) && ( 307 >= $current_exception_code ) )

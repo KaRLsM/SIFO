@@ -1,5 +1,7 @@
 <?php
+namespace SeoFramework;
 
+use PDO,PDOStatement;
 /**
  * DbDebugStatement class that is extended for debugging purposes.
  */
@@ -31,9 +33,29 @@ class MysqlDebugStatement extends MysqlStatement
 
 		$query_time = Benchmark::getInstance()->timingCurrentToRegistry( 'db_queries' );
 
-		MysqlDebug::setDebug( $this->queryString, $query_time, $context, $this, $this->db_params );
+		$query_string = $this->_replacePreparedParameters( $this->queryString, $parameters );
+		MysqlDebug::setDebug( $query_string, $query_time, $context, $this, $this->db_params );
+		
+		if ( !$result )
+		{
+			trigger_error( "Database error: " . implode( ' ', $this->errorInfo() ), E_USER_WARNING );
+		}
 
 		return $result;
+	}
+	
+	private function _replacePreparedParameters( $query_string, Array $parameters )
+	{
+		foreach( $parameters as $param => $value )
+		{
+			if ( !is_numeric( $value ) )
+			{
+				$value = '"' . $value . '"';
+			}
+			$query_string = str_replace( $param, $value, $query_string );
+		}
+		
+		return $query_string;
 	}
 
 	/**
@@ -102,7 +124,7 @@ class MysqlDebug extends Mysql
 	 *
 	 * @var string
 	 */
-	protected $statement_class = 'MysqlDebugStatement';
+	const STATEMENT_CLASS = '\\SeoFramework\\MysqlDebugStatement';
 
 	/**
 	 * Singleton static method.
@@ -158,7 +180,10 @@ class MysqlDebug extends Mysql
 
 		$query_time = Benchmark::getInstance()->timingCurrentToRegistry( 'db_' . $method );
 
-		DatabaseDebug::setDebug( $arguments[0], $query_time, $arguments[1], $result, $this->db_params );
+		if ( $arguments !== array() )
+		{
+			MysqlDebug::setDebug( $arguments[0], $query_time, $arguments[1], $result, $this->db_params );
+		}
 
 		return $result;
 	}

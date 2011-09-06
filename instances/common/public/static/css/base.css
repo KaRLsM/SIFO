@@ -1,0 +1,168 @@
+/* CSS default | base.css
+----------------------------------*/
+
+/* @group RESET CSS
+----------------------------------*/
+/* 
+html5doctor.com Reset Stylesheet
+v1.6.1
+Last Updated: 2010-09-17
+Author: Richard Clark - http://richclarkdesign.com 
+Modified: Jaume Fontal 2010-12-08
+*/
+
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video { margin:0; padding:0; border:0; outline:0; font-size:100%; vertical-align:baseline; background:transparent; }
+body { line-height:1; }
+nav ul, ol, ul { list-style:none; }
+blockquote, q { quotes:none; }
+blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+section, aside, article, footer { position:relative; display:block; overflow:hidden; }
+/* remember to define focus styles! */
+:focus { outline:0; }
+
+/* remember to highlight inserts somehow! */
+ins { text-decoration:none; }
+del { text-decoration:line-through; }
+mark { background-color:#ff9; color:#000; font-style:italic; font-weight:bold; }
+
+/* tables still need 'cellspacing="0"' in the markup */
+table { border-collapse:collapse; border-spacing:0; }
+
+/* http://perishablepress.com/press/2009/12/06/new-clearfix-hack */
+.clearfix:after { clear:both; content:' '; display: block; font-size:0; line-height:0; visibility:hidden; width:0; height:0; }
+
+/*
+	The following zoom:1 rule is specifically for IE6 + IE7.
+	Move to separate stylesheet if invalid CSS is a problem.
+*/
+* html .clearfix, *:first-child+html .clearfix { zoom:1; }
+/* @end RESET CSS */
+
+/* @group GENERIC STYLES
+----------------------------------*/
+
+/*** BASIC TYPOGRAPHY ***/
+html { font-size:11px; font-family:Verdana, Helvetica, Arial, sans-serif; }
+strong, th, thead td, h1, h2, h3, h4, h5, h6 { font-weight:bold; }
+cite, em, dfn { font-style:italic; }
+cite { font-style:normal; }
+code, kbd, samp, pre, tt, var, input[type='text'], input[type='password'], textarea { font-size:92%; font-family:monaco, "Lucida Console", courier, monospace; }
+del { text-decoration:line-through; color:#666; }
+ins, dfn { border-bottom:1px solid #ccc; }
+small, sup, sub { font-size:85%; }
+abbr, acronym { text-transform:uppercase; font-size:85%; letter-spacing:.1em; }
+a abbr, a acronym { border:none; }
+abbr[title], acronym[title], dfn[title] { cursor:help; border-bottom:1px solid #ccc; }
+sup { vertical-align:super; }
+sub { vertical-align:sub; }
+div { position:relative; overflow:hidden; }
+ol, ul, form p, form li { position:relative; display:block; overflow:hidden; }
+::-moz-selection {background:#f4f9a1; }
+::selection { background: #FAFFA8; }
+
+/*** QUOTES ***/
+blockquote { border-top:1px solid #ccc; border-bottom:1px solid #ccc; color:#666; }
+blockquote *:first-child:before { content:"\201C"; }
+blockquote *:first-child:after { content:"\201D"; }
+
+/*** BASE SIZES ***/
+.container { font-size:11px; line-height:20px; }
+h1, h2, h3, h4, h5, h6 { font-family:"Trebuchet Ms", Arial, sans-serif; }
+h1 { font-size:25px; font-weight:normal; margin-left:14px; padding:0 0 10px 30px; color:#72399F; }
+	h1 strong { font-weight:normal; color:#4c4c4c; }
+h2 { font-size:20px; }
+h3 { font-size:16px; margin:15px 8px; line-height:24px; color:#828386; }
+	h3 strong { color:#4c4c4c; }
+h4 { font-size:14px; }
+h5 { font-size:13px; }
+h6 { font-size:12px; }
+
+/*** TABLES ***/
+table { border-top: 1px solid #ccc;  border-left: 1px solid #ccc; }
+th, td { border-bottom: 1px solid #ddd; border-right: 1px solid #ccc; }
+hr { clear:both; border:0; border-bottom:1px solid #eee; margin:20px 20px 0; }
+
+/*** IMAGES ***/
+img { border:2px solid #c4c3c3; }
+
+/*** MARGINS & PADDINGS ***/
+blockquote *:first-child { margin:10px 0; }
+/*hr, p, ul, ol, dl, pre, blockquote, address, table, form { margin-bottom: 1.6em; } */
+th, td { padding: .8em; }
+caption { padding-bottom: .8em; } /*** padding instead of margin for IE ***/
+blockquote { padding: 0 1em; margin: 1.6em 0; }
+fieldset { padding: 0 1em 1em 1em; margin: 1em 0; } /*** padding-top is margin-top for fieldsets in Opera ***/
+legend+* { margin-top: 1em; } /*** compensates for the opera margin bug ***/
+textarea, input.text,
+input.error, input.notice, input.success,
+textarea.error, textarea.notice, textarea.success { padding: .3em .4em .15em .4em; margin:0.2em; }
+select, select.error, select.notice, select.success  { padding: .1em .2em 0 .2em; margin:0.2em; }
+
+option { padding: 0 .4em; }
+a { position:relative; padding:0.3em 0 .1em 0; line-height:16px; } /*** for larger click-area ***/
+dl { margin:0; }
+ol ol, ul ol, ol ul, ul ul { margin-left: 2.5em; }
+form div { margin-bottom: .8em; }
+
+/*** COLORS ***/
+a:link { text-decoration:none; color:#1095e1; }
+a:visited { text-decoration:none; color:#1095e1; }
+a:hover, a:focus { text-decoration:underline; color:#1095e1; }
+a:active { color:#000; }
+code, pre { color:#c33; } /*** very optional, but still useful. W3C uses about the same colors for codes ***/
+
+/*** LINK PADDING FOR ICONS ***/
+a[href$=".pdf"], a[href$=".doc"], a[href$=".xls"], a[href$=".rss"], a[href$=".rdf"], a[href^="aim:"] { padding:2px 22px 2px 0; margin:-2px 0; background-repeat: no-repeat; background-position: right center; }
+
+/*** FILE LINK ICONS ***/
+a[href$=".pdf"] { background-image: url(/shared/images/icons/pdf.png); }
+a[href$=".doc"] { background-image: url(/shared/images/icons/doc.png); }
+a[href$=".xls"] { background-image: url(/shared/images/icons/xls.png); }
+
+/*** MISCELLANEOUS LINK ICONS ***/
+a[href$=".rss"], a[href$=".rdf"] { background-image: url(/shared/images/icons/feed.png); }
+a[href^="aim:"] { background-image: url(/shared/images/icons/im.png); }
+
+/*** TEXT CLASSES ***/
+.small {font-size:.8em;margin-bottom:1.875em;line-height:1.875em;}
+.large {font-size:1.2em;line-height:2.5em;margin-bottom:1.25em;}
+.hide {display:none;}
+.quiet {color:#666;}
+.loud {color:#000;}
+.highlight {background:#ff0;}
+.top {margin-top:0;padding-top:0;}
+.bottom {margin-bottom:0;padding-bottom:0;}
+.thin {font-weight: lighter;}
+.error, .notice, .success { padding:.8em; margin-bottom:1.6em; }
+.error {background-color:#FBE3E4; color:#8a1f11; border-color:#FBC2C4;}
+.notice { background-color:#FFF6BF; color:#514721; border-color:#FFD324;}
+.success { background-color:#E6EFC2; color:#264409; border-color:#C6D880;}
+.error a {color:#8a1f11; background:none; padding:0; margin:0; }
+.notice a {color:#514721; background:none; padding:0; margin:0; }
+.success a {color:#264409; background:none; padding:0; margin:0; }
+.center {text-align: center;}
+.nomargin { margin:0; }
+
+/*** FANCY SERIF ***/
+.fancy { color: #666; font-family: "Warnock Pro", "Goudy Old Style","Palatino","Book Antiqua", Georgia, serif; font-style: italic; font-weight: normal; }
+
+/*** SMALL CAPS ***/
+.caps { font-variant: small-caps; letter-spacing: 1px; text-transform: lowercase; font-size:1.2em; font-weight:bold; padding:0 2px; }
+
+a.simple_btn { float:left; display:block; padding:2px 6px 2px 19px; border:1px solid #fff; font-weight:bold; font-size:10px; line-height:14px; color:#707579; background:url(/shared/images/interface/btnicons.png) no-repeat 4px 5px; border-radius:2px; -moz-border-radius:2px; -webkit-border-radius:2px;}
+	a.simple_btn:hover { color:#fff; border:1px solid #68696c; background-color:#9d9d9d; background-position:4px -22px; text-decoration:none; }
+
+/* @group h1 icons */
+	h1 { background:url(/shared/images/interface/tabicons.png) no-repeat left bottom; }
+		h1.release { background-position:7px 7px; }
+		h1.calendar { background-position:7px -27px; }
+		h1.folder { background-position:7px -55px; }
+/* @endgroup h1 icons */
+.boxshadow { -moz-box-shadow: 0 0 4px #999; -webkit-box-shadow: 0 0 4px #999; -webkit-transition: all 0.1s ease-out; }
+.boxshadow:hover { -moz-box-shadow: 0 0 8px #555; -webkit-box-shadow: 0 0 8px #555; }
+
+.hidden, .ui-tabs-hide { display:none; }
+.clear { clear:both; }
+.left { float:left !important; }
+.right { float:right !important; }
+/* @endgroup GENERIC STYLES */

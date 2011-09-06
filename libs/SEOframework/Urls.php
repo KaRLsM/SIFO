@@ -1,22 +1,5 @@
 <?php
-/**
- * LICENSE
- * 
- * Copyright 2010 Albert Lombarte
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+namespace SeoFramework;
 
 /**
  * Parses all the URLs.
@@ -44,12 +27,6 @@ class UrlParser
 	 * @var string
 	 */
 	static public $normalize_values = false;
-	/**
-	 * Evaluated scheme used (http|https).
-	 *
-	 * @var string
-	 */
-	static public $scheme = 'http';
 	/**
 	 * Evaluated path context.
 	 *
@@ -125,11 +102,6 @@ class UrlParser
 
 		$clean_host = preg_replace( '/^' . $domains->getSubdomain() . '\./', '', $domains->getDomain() );
 
-		if ( $filter_server->getString( 'HTTPS' ) )
-		{
-			self::$scheme = 'https';
-		}
-
 		if ( true === $domains->www_mode )
 		{
 			self::$main_url = 'http://www.' . $clean_host;
@@ -140,7 +112,7 @@ class UrlParser
 		}
 
 		// E.g: http://domain.com/folder1/subfolder1/subfolder11
-		self::$base_url = self::$scheme . '://' . $filter_server->getString( 'HTTP_HOST' );
+		self::$base_url = 'http://' . $filter_server->getString( 'HTTP_HOST' );
 		self::$url_definition = Config::getInstance( $instance_name )->getConfig( 'url_definition' );
 
 		// Default url.config for all languages.
@@ -288,13 +260,16 @@ class UrlParser
 	{
 		$separator = self::$url_definition['word_separator'];
 
+		// Convert string to lowercase.
+		$string = strtolower( $string );
+
 		// Replace most common caracters with his sanitized version.
 		$string = strtr( utf8_decode( trim( preg_replace( '/\s+/', ' ', $string ) ) ),
 						utf8_decode( "¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðòóôõöøùúûüýÿþŔŕñ' " ),
 						utf8_decode( "YuAAAAAAACEEEEIIIIDOOOOOOUUUUYbsaaaaaaaceeeeiiiiooooooouuuuyybRrn" . $separator . $separator ) );
 
 		// Remove characters other than a-z, 0-9 and the separator.
-		$string = trim( preg_replace( '/[^0-9a-z' . $separator . ']/', '', strtolower( $string ) ), $separator );
+		$string = trim( preg_replace( '/[^0-9a-z' . $separator . ']/', '', $string ), $separator );
 		$string = preg_replace( '/' . $separator . '+/', $separator, $string );
 
 		// And in case there is more bullshit..
