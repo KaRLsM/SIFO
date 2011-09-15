@@ -1,7 +1,24 @@
 <?php
-namespace SeoFramework;
+/**
+ * LICENSE
+ *
+ * Copyright 2010 Albert Lombarte
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
-require_once ROOT_PATH . '/libs/SEOframework/Filter.php';
+namespace SeoFramework;
 
 class Domains
 {
@@ -15,7 +32,7 @@ class Domains
 	protected $dev_mode = false;
 	protected $instance;
 	protected $domain_configuration = array();
-	protected $php_inis = array();
+	protected $php_inis = false;
 	protected $redirect;
 	protected $auth_data = array();
     protected $http_host;
@@ -51,7 +68,7 @@ class Domains
 		$this->port = isset( $host_data[1] ) ? $host_data[1] : null;
 
 		$this->domain_configuration = Config::getInstance()->getConfig( 'domains' );
-		
+
 		if ( isset( $this->domain_configuration['instance_type'] ) )
 		{
 			unset( $this->domain_configuration['instance_type'] );
@@ -168,6 +185,11 @@ class Domains
 					$auth_parts = explode( ',', $settings['auth'] );
 					$this->auth_data['user'] = $auth_parts[0];
 					$this->auth_data['password'] = $auth_parts[1];
+
+					if ( isset( $settings['trusted_ips'] ) )
+					{
+						$this->auth_data['trusted_ips'] = explode( ',', $settings['trusted_ips'] );
+					}
 				}
 
 				if ( isset( $settings['static_host'] ) )
@@ -192,11 +214,7 @@ class Domains
 					}
 				}
 
-				if ( !( isset( $settings['php_ini_sets'] ) && is_array( $settings['php_ini_sets'] ) ) )
-				{
-					trigger_error( "SIFO: Please define the 'php_ini_sets' array in your domains.config file. You can take a look to the default instance",  E_USER_NOTICE );
-				}
-				else
+				if ( ( isset( $settings['php_ini_sets'] ) && !empty( $settings['php_ini_sets'] ) ) )
 				{
 					$this->php_inis = $settings['php_ini_sets'];
 				}
@@ -315,6 +333,13 @@ class Domains
 	 */
 	public function getStaticHost()
 	{
+		$filter_server = FilterServer::getInstance();
+
+		if ( $filter_server->getString( 'HTTPS' ) )
+		{
+			return str_replace( 'http://', 'https://', $this->static_host );
+		}
+
 		return $this->static_host;
 	}
 
@@ -325,6 +350,13 @@ class Domains
 	 */
 	public function getMediaHost()
 	{
+		$filter_server = FilterServer::getInstance();
+
+		if ( $filter_server->getString( 'HTTPS' ) )
+		{
+			return str_replace( 'http://', 'https://', $this->media_host );
+		}
+
 		return $this->media_host;
 	}
 

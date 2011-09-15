@@ -71,18 +71,14 @@
 	<rule ref="Squiz.Classes.ValidClassName"/>
 	
 <!--	CSS Provisional, no es lo que queremos -->
-	<rule ref="Squiz.CSS.ClassDefinitionClosingBraceSpace"/>
 	<rule ref="Squiz.CSS.ClassDefinitionNameSpacing"/>
-	<rule ref="Squiz.CSS.ClassDefinitionOpeningBraceSpace"/>
-	<rule ref="Squiz.CSS.ColonSpacing"/>
-	<rule ref="Squiz.CSS.ColourDefinition"/>
-	<rule ref="Squiz.CSS.DisallowMultipleStyleDefinitions"/>
+	<rule ref="Musicjumble.CSS.ClassDefinitionOpeningBraceSpace"/>
+	<rule ref="Musicjumble.CSS.ColonSpacing"/>
+	<rule ref="Musicjumble.CSS.ColourDefinition"/>
 	<rule ref="Squiz.CSS.DuplicateClassDefinition"/>
 	<rule ref="Squiz.CSS.DuplicateStyleDefinition"/>
 	<rule ref="Squiz.CSS.EmptyClassDefinition"/>
 	<rule ref="Squiz.CSS.EmptyStyleDefinition"/>
-	<rule ref="Squiz.CSS.Indentation"/>
-	<rule ref="Squiz.CSS.LowercaseStyleDefinition"/>
 	<rule ref="Squiz.CSS.MissingColon"/>
 	<rule ref="Squiz.CSS.Opacity"/>
 	<rule ref="Squiz.CSS.SemicolonSpacing"/>

@@ -1,9 +1,31 @@
 <?php
+/**
+ * LICENSE
+ *
+ * Copyright 2010 Albert Lombarte
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 namespace SeoFramework;
 
 /**
+ * Old-school Directory class.
+ *
  * TODO: Migrate to SPL when PHP 5.3 is found easily on shared hostings.
- * Use RecursiveDirectoryIterator
+ * Directory interaction for those not being able to use RecursiveDirectoryIterator
+ * @deprecated Use Directory.php for new implementations.
  */
 class Dir
 {
@@ -12,7 +34,7 @@ class Dir
 	 *
 	 * @var array
 	 */
-	protected $ignored_files = array( '.', '..', '.svn', '.DS_Store', 'Thumbs.db', '_smarty' );
+	protected $ignored_files = array( '.', '..', '.svn', '.git', '.DS_Store', 'Thumbs.db', '_smarty' );
 
 	/**
 	 * Returns an array containing a list of files found recursively for a given path.
@@ -107,6 +129,11 @@ class Dir
 		sort( $list );
 
 		return $list;
+	}
+
+	public function setIgnore( Array $ignored_files )
+	{
+		$this->ignored_files = $ignored_files;
 	}
 
 }

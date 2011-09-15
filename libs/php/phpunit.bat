@@ -1,3 +1,3 @@
 @echo off
-set PHPBIN=D:\Code\musicjumble\libs\php\php.exe
-"%PHPBIN%" "D:\Code\musicjumble\libs\php\phpunit" %*
+set PHPBIN=D:\code\musicjumble\libs\php\php.exe
+"%PHPBIN%" "D:\code\musicjumble\libs\php\phpunit" %*

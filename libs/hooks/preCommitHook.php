@@ -5,6 +5,10 @@
  * and open the template in the editor.
  */
 
+require_once 'PHP/CodeSniffer/CLI.php';
+require_once 'PHP/PMD/TextUI/Command.php';
+require_once 'html5lib/Parser.php';
+
 /**
  * Description of preCommitHook
  *
@@ -16,17 +20,43 @@ class preCommitHook
 
 	protected $arguments = array(
 		'standalone' => false,
-		'files' => ''
+		'files' => array()
 	);
 
 	protected $ignore_patterns = array(
 		'libs/',
+		'Bootstrap.php'
 	);
 
 	protected $phpcs_args = array(
-		'--standard' => 'Musicjumble',
-		'--tab-width' => '4'
+		'files' => array(),
+		'standard' => 'Musicjumble',
+		'verbosity' => 0,
+		'interactive' => false,
+		'local' => false,
+		'showSources' => false,
+		'extensions' => array( 'php', 'css', 'js' ),
+		'sniffs' => array(),
+		'ignored' => array(),
+		'reportFile' => null,
+		'generator' => '',
+		'reports' => array(),
+		'warningSeverity' => null,
+		'tabWidth' => 4,
+		'encoding' => 'utf-8',
+		'errorSeverity' => null,
+		'reportWidth' => 80,
+		'showProgress' => false
 	);
+
+	protected $phpmd_args = array(
+		'',
+		'', // This will be replaced later with the file to be processed.
+		'text',
+		'codesize,design,naming,unusedcode'
+	);
+
+	protected $has_errors = false;
 
 	public function __construct( $arguments )
 	{
@@ -37,7 +67,7 @@ class preCommitHook
 
 	protected function processArguments( Array $arguments )
 	{
-		$return['files'] = '';
+		$return['files'] = array();
 		foreach ( $arguments as $key => $argument )
 		{
 			switch ( $argument )
@@ -48,39 +78,33 @@ class preCommitHook
 				default:
 					if ( $key !== 0 )
 					{
-						$return['files'] .= $argument . ' ';
+						$return['files'][] = $argument;
 					}
 			}
 		}
-
-		trim( $return['files'] );
 
 		return $return;
 	}
 
 	public function process()
 	{
-		if ( $this->arguments['standalone'] )
+		if ( !$this->arguments['standalone'] )
 		{
-			if ( empty( $this->arguments['files'] ) )
-			{
-				throw new Exception( 'No files added.' );
-			}
-		}
-		else
-		{
-			$this->phpcs_args[] = '-n';
+			$this->phpcs_args['warningSeverity'] = 0;
 			$this->addGitFiles();
 		}
 
-		$this->addMessage( $this->executePhpCs() );
-		$this->addMessage( $this->executePhpMd() );
-
-		$this->output = trim( $this->output );
-
-		if ( false !== strpos( $this->output, "\n" ) )
+		if ( !empty( $this->arguments['files'] ) )
 		{
-			throw new Exception( "\n\nMal empezamos si no hacemos esto bien..." );
+			$this->addMessage( $this->executePhpCs() );
+			$this->addMessage( $this->executePhpMd() );
+			$this->addMessage( $this->executeDomDocument() );
+			$this->output = trim( $this->output );
+
+			if ( $this->has_errors )
+			{
+				throw new Exception( "\n\nMal empezamos si no hacemos esto bien..." );
+			}
 		}
 
 		$this->addMessage( "\n\nMacanudo che!" );
@@ -88,56 +112,86 @@ class preCommitHook
 
 	protected function executePhpCs()
 	{
-		return shell_exec(
-						ROOT_PATH . "libs/php/phpcs " .
-						$this->buildScriptArguments( $this->phpcs_args )
-						. " " . $this->arguments['files']
-		);
+		$phpcs = new PHP_CodeSniffer_CLI();
+		$this->phpcs_args['files'] = $this->arguments['files'];
+
+		if ( 1 === count( $this->phpcs_args['files'] ) && false === stripos( $this->phpcs_args['files'][0], '.tpl' ) )
+		{
+			if ( 0 !== $phpcs->process( $this->phpcs_args ) )
+			{
+				$this->has_errors = true;
+			}
+		}
 	}
 
 	protected function executePhpMd()
 	{
-		$files = explode( ' ', $this->arguments['files'] );
-
-		$output = '';
-		foreach ( $files as $file )
+		foreach ( $this->arguments['files'] as $file )
 		{
-			if ( !empty( $file ) )
+			if ( !empty( $file ) && false === stripos( $file, '.tpl' ) )
 			{
-				$output = shell_exec(
-						ROOT_PATH .
-						"libs/php/phpmd $file text codesize,design,naming,unusedcode"
-				);
+				$this->phpmd_args[1] = $file;
+				if ( 0 !== PHP_PMD_TextUI_Command::main( $this->phpmd_args ) )
+				{
+					$this->has_errors = true;
+				}
 			}
 		}
-		$output = trim( $output ) . "\n";
+	}
 
-		return $output;
+	protected function executeDomDocument()
+	{
+		$errors = array();
+		foreach ( $this->arguments['files'] as $file )
+		{
+			if ( false !== stripos( $file, '.tpl' ) )
+			{
+				echo "File $file: ";
+				$errors = HTML5_Parser::detectErrors( file_get_contents( $file ) );
+
+				if ( array() !== $errors )
+				{
+					$this->has_errors = true;
+					echo '[KO]';
+				}
+				else
+				{
+					echo '[OK]';
+				}
+
+				echo "\n";
+			}
+		}
+
+		foreach ( $errors as $error )
+		{
+			echo $error;
+		}
 	}
 
 	protected function addGitFiles()
 	{
-		$output = shell_exec(
-				'git diff-index --cached --name-only --diff-filter=ACMR HEAD --'
-		);
-		$files_to_commit = explode( "\n", trim( $output ) );
-
-		$streamlined_files = '';
-		foreach ( $files_to_commit as &$filename )
+		$filtered_files = array();
+		foreach ( $this->arguments['files'] as &$filename )
 		{
 			$valid_file = true;
 			foreach ( $this->ignore_patterns as $pattern )
 			{
 				$valid_file = ( false === strpos( $filename, $pattern ) );
+
+				if ( !$valid_file )
+				{
+					break;
+				}
 			}
 
-			if ( $valid_file || $valid_file = ( false !== stripos( $filename, 'SEOFramework/' ) ) )
+			if ( $valid_file )
 			{
-				$streamlined_files .= ' ' . trim( $filename );
+				$filtered_files[] = ROOT_PATH . trim( $filename );
 			}
 		}
 
-		$this->arguments['files'] = $streamlined_files;
+		$this->arguments['files'] = $filtered_files;
 	}
 
 	protected function buildScriptArguments( $argument_template )

@@ -1,4 +1,23 @@
 <?php
+/**
+ * LICENSE
+ *
+ * Copyright 2010 Albert Garcia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 namespace SeoFramework;
 
 class Search
@@ -19,19 +38,19 @@ class Search
 		if ( !isset ( self::$instance ) )
 		{
 			$sphinx_active = Config::getInstance()->getConfig( 'sphinx', 'active' );
-			
+
 			// Check if Sphinx is enabled by configuration:
 			if ( true === $sphinx_active )
 			{
 				include ROOT_PATH . '/libs/'.Config::getInstance()->getLibrary( 'sphinx' ) . '/sphinxapi.php';
-				
+
 				$sphinx_server 	= Config::getInstance()->getConfig( 'sphinx', 'server' );
 				$sphinx_port 	= Config::getInstance()->getConfig( 'sphinx', 'port' );
-								
-				self::$search_engine 	= 'Sphinx';			
+
+				self::$search_engine 	= 'Sphinx';
 				self::$instance 		= new SphinxClient();
 				self::$instance->SetServer( $sphinx_server, $sphinx_port );
-				
+
 				// Check that Sphinx is listening:
 				if ( true ==! self::$instance->Open() )
 				{
@@ -70,7 +89,7 @@ class Search
 	 * @return mixed
 	 */
 	function __call($method, $args)//call adodb methods
-	{	
+	{
 		return call_user_func_array(array(self::$instance, $method),$args);
 	}
 }

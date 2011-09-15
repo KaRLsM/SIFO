@@ -1,4 +1,23 @@
 <?php
+/**
+ * LICENSE
+ *
+ * Copyright 2010 Albert Garcia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 namespace SeoFramework;
 
 require_once ROOT_PATH . '/libs/GeoIP-Lite/geoip.php';
@@ -37,31 +56,31 @@ class Client{
 	private function __construct()
 	{
 	}
-	
+
     /**
     * Get 2 letter country code from client IP.
     */
 	public static function getCountryCode() {
-	
+
 		if ( Registry::KeyExists( 'Client_CountryCode' ) )
 		{
-			$country_code = Registry::getKey( 'Client_CountryCode' );		
+			$country_code = Registry::getKey( 'Client_CountryCode' );
 		}
 		else
 		{
 			$gi = geoip_open( ROOT_PATH . '/libs/GeoIP-Lite/GeoIP.dat',GEOIP_MEMORY_CACHE);
 			$country_code = geoip_country_code_by_addr($gi, self::getIP() );
 			geoip_close($gi);
-		}			
+		}
 
 		return $country_code;
 	}
-	
+
     /**
     * Get country name from client IP.
     */
 	public static function getCountryName() {
-	
+
 		if ( Registry::KeyExists( 'Client_CountryName' ) )
 		{
 			$country_code = Registry::getKey( 'Client_CountryName' );
@@ -71,29 +90,29 @@ class Client{
 			$gi = geoip_open( ROOT_PATH . '/libs/GeoIP-Lite/GeoIP.dat',GEOIP_MEMORY_CACHE);
 			$country_code = geoip_country_name_by_addr($gi, self::getIP() );
 			geoip_close($gi);
-		}			
+		}
 
 		return $country_code;
 	}
-	
+
     /**
     * Get browser information.
     */
 	public static function getBrowser( $useragent = null, $return_array = false ) {
-	
+
 		if ( Registry::keyExists( 'Client_Browser' ) )
 		{
-			$browser = Registry::getKey( 'Client_Browser' );		
+			$browser = Registry::getKey( 'Client_Browser' );
 		}
 		else
 		{
 			$bc = new Browscap( ROOT_PATH . '/libs/Browscap/');
 			$browser = $bc->getBrowser( $useragent, $return_array );
-		}			
+		}
 
 		return $browser;
 	}
-	
+
     /**
     * Get browser default language.
     */
@@ -106,9 +125,9 @@ class Client{
 	   else
 	      return self::parseDefaultLanguage(NULL);
 	}
-		
+
 	private static function parseDefaultLanguage($http_accept, $deflang = "es-es") {
-	   if(isset($http_accept) && strlen($http_accept) > 1)  
+	   if(isset($http_accept) && strlen($http_accept) > 1)
 	   {
 	      # Split possible languages into array
 	      $x = explode(",",$http_accept);
@@ -119,7 +138,7 @@ class Client{
 	         else
 	            $lang[$val] = 1.0;
 	      }
-	
+
 	      #return default language (highest q-value)
 	      $qval = 0.0;
 	      foreach ($lang as $key => $value) {
@@ -130,8 +149,8 @@ class Client{
 	      }
 	   }
 	   return strtolower($deflang);
-	}	
-	
+	}
+
     /**
     * Get real client IP.
     */
@@ -158,7 +177,7 @@ class Client{
 		{
 			$ip = '89.140.161.225';
 		}
-		
+
 		// From http://www.eslomas.com/index.php/archives/2005/04/26/obtencion-ip-real-php/
 		$entries = preg_split ( '/[,\s]/' , $ip );
 
@@ -190,15 +209,15 @@ class Client{
 
 		return trim ( $ip );
 	}
-	
+
     /**
-    * Determines if actual client is a Crawler 
+    * Determines if actual client is a Crawler
     * based on USERAGENTS contained in Browscap library.
     */
 	public static function isCrawler ()
 	{
 		$browser_info = self::getBrowser();
-		
+
 		if ( false == $browser_info->Crawler || empty( $browser_info->Crawler ) )
 		{
 			return false;

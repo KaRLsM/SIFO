@@ -1,8 +1,27 @@
 <?php
+/**
+ * LICENSE
+ *
+ * Copyright 2010 Albert Lombarte
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 namespace SeoFramework;
 
 /**
- * Show a message.
+ * Class that keeps messages of errors, success, etc... in the registry.
  */
 class FlashMessages
 {
@@ -10,7 +29,7 @@ class FlashMessages
 	const MSG_OK = 'msg_ok';
 	const MSG_WARNING = 'msg_warning';
 	const MSG_INFO = 'msg_info';
-	
+
 	const STORAGE_REGISTRY = 1;
 	const STORAGE_SESSION = 2;
 
@@ -84,7 +103,7 @@ class FlashMessages
 	static private function _getMsgs( $storage_engine )
 	{
 		$registry = self::_getStorageEngine( $storage_engine );
-		
+
 		$msgs = $registry->get( 'flash_messages' );
 		if ( $msgs && $storage_engine === self::STORAGE_SESSION )
 		{
@@ -98,7 +117,7 @@ class FlashMessages
 
 		return array();
 	}
-	
+
 	static private function _getStorageEngine( $engine )
 	{
 		switch ( $engine )
@@ -110,6 +129,5 @@ class FlashMessages
 			default:
 				throw new Exception_503( 'Invalid storage type.' );
 		}
-		
 	}
 }

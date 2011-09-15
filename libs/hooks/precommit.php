@@ -10,6 +10,7 @@ $return = 0;
 try
 {
 	$precommit = new preCommitHook( $argv );
+	$_SERVER['argv'] = null;
 	$precommit->process();
 }
 catch( Exception $e )

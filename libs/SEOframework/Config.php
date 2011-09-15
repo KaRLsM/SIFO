@@ -1,9 +1,26 @@
 <?php
+/**
+ * LICENSE
+ *
+ * Copyright 2010 Albert Lombarte
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 namespace SeoFramework;
 
 /**
- * CAUTION: This class must be compatible with PHP5.2 FOR EVER!.
- *
  * Configuration file parser.
  */
 class Config
@@ -47,7 +64,7 @@ class Config
 		{
 			$this->config_path = ROOT_PATH . "/instances/" . $instance_name ."/config/";
 		}
-		// $this->paths_to_configs = $this->parseIni( $this->configuration_files );
+
 		include_once( $this->config_path . $this->configuration_files );
 		$this->paths_to_configs = $config;
 	}
@@ -162,18 +179,18 @@ class Config
 			$class_type = array_reverse( $class_type );
 			$path = $classes[$class_type[0]][$class_type[1]];
 		}
-		
+
 		if ( isset( $classes[$class_type[0]] ) && !isset( $path ) )
 		{
 			$path = array_pop( $classes[$class_type[0]] );
 		}
-		
+
 		if ( !isset( $classes[$class_type[0]] ) )
 		{
 			// Error handling.
 			throw new Exception_Configuration( "The variable '{$class_type[0]}' was not found in the classes file. ", E_USER_ERROR );
 		}
-		
+
 		// The var is OK,  we return the requested array element.
 		$classname = "\\{$class_type[1]}\\$class_type[0]";
 		return array( 'name' => $classname, 'path' => $path );
